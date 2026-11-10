@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "seqfetch"
+version = "0.1.0"
+description = "Provider-agnostic sequencing data downloader with streaming MD5 verification"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "seqfetch contributors" }]
+keywords = ["bioinformatics", "sequencing", "fastq", "download", "md5", "gsa", "ena", "sra"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = []
+
+[project.optional-dependencies]
+yaml = ["PyYAML>=6.0"]
+excel = ["openpyxl>=3.1"]
+dev = ["pytest>=7", "PyYAML>=6.0", "openpyxl>=3.1"]
+
+[project.scripts]
+seqfetch = "seqfetch.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

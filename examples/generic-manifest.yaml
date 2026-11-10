@@ -1,0 +1,45 @@
+version: 1
+
+# Any archive that can export a CSV/TSV file list.
+# Column names and the URL template are configuration, not code.
+provider:
+  name: manifest
+  options:
+    path: /data/files.tsv
+    delimiter: "\t"
+    size_unit: bytes
+    columns:
+      project: study
+      sample: sample
+      run: run_accession
+      filename: fastq_ftp
+      size: fastq_bytes
+      md5: fastq_md5
+      url: ""
+    # Used when there is no URL column. {filename} is the raw value;
+    # {filename_q} is URL-encoded; {project}/{sample}/{run} are also available.
+    url_template: "https://ftp.ebi.ac.uk/{filename}"
+
+storage:
+  targets:
+    - /data/disk1/seq
+  reserve_gib: 200
+  layout: "{project}/{run}/{filename}"
+
+state:
+  dir: /var/lib/seqfetch/manifest
+
+transfer:
+  retries: 10
+  attempts: 2
+  speed_time: 180
+  speed_limit_kbps: 1024
+  resume: true
+
+verification:
+  mode: streaming
+  on_mismatch: redownload
+
+reporting:
+  every_seconds: 1800
+  formats: [md, json, csv]

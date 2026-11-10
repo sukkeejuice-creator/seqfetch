@@ -1,0 +1,76 @@
+version: 1
+
+# Provider-neutral starting point.
+# Replace only the provider block for a different archive.
+provider:
+  name: manifest
+  options:
+    path: /data/files.tsv
+    delimiter: "\t"
+    size_unit: bytes
+    columns:
+      project: project
+      sample: sample
+      run: run
+      filename: filename
+      size: size
+      md5: md5
+      url: url
+    # url_template: "https://archive.example/{project}/{run}/{filename}"
+
+selection:
+  # Used by table-driven providers (GSA-Human) and for status annotation.
+  # table: /data/samples.xlsx
+  # sheet: sheet1
+  # columns:
+  #   project: project
+  #   sample: sample
+  #   name: name
+  #   size_gib: size_gib
+  #   platform: platform
+  # filters:
+  #   platform: "10x Chromium"
+
+storage:
+  targets:
+    - /data/disk1/seq
+    # - /data/disk2/seq
+  reserve_gib: 200
+  layout: "{project}/{run}/{filename}"
+  order: size_desc
+  on_insufficient: stop
+
+state:
+  # Fixed local disk. Never inside a target.
+  dir: /var/lib/seqfetch/campaign
+
+transfer:
+  curl: curl
+  retries: 10
+  attempts: 2
+  retry_delay: 2
+  connect_timeout: 60
+  speed_time: 180
+  speed_limit_kbps: 1024
+  ftp_pasv: true
+  ftp_method: singlecwd
+  resume: true
+  max_consecutive_failures: 5
+
+verification:
+  mode: streaming          # streaming | bulk | none
+  read_backup: true
+  on_mismatch: redownload
+  require_official_md5: false
+
+status:
+  enabled: false
+  source_table: /data/samples.xlsx
+  output_table: /data/samples_status.xlsx
+  key: sample
+  prefix: seq
+  every_seconds: 300
+
+reporting:
+  every_seconds: 1800
+  formats: [md, json, csv]
